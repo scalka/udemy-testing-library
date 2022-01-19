@@ -1,4 +1,6 @@
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
 import SummaryForm from '../SummaryForm';
 
 test('initial conditions', async () => {
@@ -30,10 +32,10 @@ test('summary form checkbox disabled submit button', async () => {
   });
 
   // checking checkbox enables button
-  checkbox.click();
+  userEvent.click(checkbox);
   expect(button).toBeEnabled();
   // unchecking checkbox again disables button
-  checkbox.click();
+  userEvent.click(checkbox);
   expect(button).toBeDisabled();
 });
 
