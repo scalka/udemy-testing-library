@@ -1,3 +1,43 @@
+import { render, screen } from '@testing-library/react';
+import SummaryForm from '../SummaryForm';
+
+test('initial conditions', async () => {
+  render(<SummaryForm />);
+
+  const checkbox = screen.getByRole('checkbox', {
+    // regular expression
+    name: /terms and conditions/i,
+  });
+
+  const button = screen.getByRole('button', {
+    name: /confirm order/i,
+  });
+  // checkbox is unchecked by default and button is disabled
+  expect(checkbox).not.toBeChecked();
+  expect(button).toBeDisabled();
+});
+
+test('summary form checkbox disabled submit button', async () => {
+  render(<SummaryForm />);
+
+  const checkbox = screen.getByRole('checkbox', {
+    // regular expression
+    name: /terms and conditions/i,
+  });
+
+  const button = screen.getByRole('button', {
+    name: /confirm order/i,
+  });
+
+  // checking checkbox enables button
+  checkbox.click();
+  expect(button).toBeEnabled();
+  // unchecking checkbox again disables button
+  checkbox.click();
+  expect(button).toBeDisabled();
+});
+
+/* 
 import {
   render,
   screen,
@@ -53,3 +93,4 @@ test('popover responds to hover', async () => {
     screen.queryByText(/no ice cream will actually be delivered/i)
   );
 });
+ */
