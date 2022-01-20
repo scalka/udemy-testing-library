@@ -9,6 +9,17 @@ export const handlers = [
       ])
     );
   }),
+
+  rest.get('http://localhost:3030/toppings', (req, res, context) => {
+    return res(
+      context.json([
+        { name: 'Cherries', imagePath: '/images/Cherries.png' },
+        { name: 'M&Ms', imagePath: '/images/m-and-ms.png' },
+        { name: 'Hot fudge', imagePath: '/images/hot-fudge.png' },
+      ])
+    );
+  }),
+  /* 
   rest.get('http://localhost:3030/toppings', (req, res, ctx) => {
     return res(
       ctx.json([
@@ -17,7 +28,7 @@ export const handlers = [
         { name: 'Hot fudge', imagePath: '/images/hot-fudge.png' },
       ])
     );
-  }),
+  }), */
   rest.post('http://localhost:3030/order', (req, res, ctx) => {
     return res(ctx.json({ orderNumber: 123455676 }));
   }),

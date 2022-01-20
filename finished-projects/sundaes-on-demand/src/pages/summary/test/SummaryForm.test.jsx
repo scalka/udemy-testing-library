@@ -3,11 +3,11 @@ import userEvent from '@testing-library/user-event';
 
 import SummaryForm from '../SummaryForm';
 
-test('initial conditions', async () => {
+test('initial conditions', () => {
   render(<SummaryForm />);
 
   const checkbox = screen.getByRole('checkbox', {
-    // regular expression
+    // regular expression, with i meaning case insensitive
     name: /terms and conditions/i,
   });
 
@@ -19,7 +19,7 @@ test('initial conditions', async () => {
   expect(button).toBeDisabled();
 });
 
-test('summary form checkbox disabled submit button', async () => {
+test('summary form checkbox disabled submit button', () => {
   render(<SummaryForm />);
 
   const checkbox = screen.getByRole('checkbox', {
