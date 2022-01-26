@@ -2,6 +2,7 @@ import { render, screen } from '../../../test-utils/testing-library-utils';
 import userEvent from '@testing-library/user-event';
 import Options from '../Options';
 import OrderEntry from '../OrderEntry';
+import ToppingOption from '../ToppingOption';
 
 test('update scoop subtotal when scoops change', async () => {
   render(<Options optionType="scoops" />);
@@ -27,6 +28,33 @@ test('update scoop subtotal when scoops change', async () => {
   expect(scoopsSubtotal).toHaveTextContent('6.00');
 });
 
+test('update topping subtotal on change', async () => {
+  render(<Options optionType="toppings" />);
+
+  // get checkbox
+  const checkboxCherries = await screen.findByRole('checkbox', {
+    name: 'Cherries',
+  });
+  const checkboxMMs = await screen.findByRole('checkbox', { name: 'M&Ms' });
+
+  // subtotal starts at 0.00
+  const subtotal = screen.getByText('Toppings total: $', { exact: false });
+  expect(subtotal).toHaveTextContent(0.0);
+
+  // Update subtotal with one topping
+  userEvent.click(checkboxCherries);
+  expect(checkboxCherries).toBeChecked();
+  expect(subtotal).toHaveTextContent(1.5);
+
+  // Update subtotal with two toppings
+  userEvent.click(checkboxMMs);
+  expect(subtotal).toHaveTextContent(3.0);
+
+  // make sure user can also uncheck a box
+  userEvent.click(checkboxMMs);
+  expect(subtotal).toHaveTextContent(1.5);
+});
+
 test('update toppings subtotal when toppings change', async () => {
   // render parent component
   render(<Options optionType="toppings" />);
@@ -50,6 +78,59 @@ test('update toppings subtotal when toppings change', async () => {
   // remove hot fudge and check subtotal
   userEvent.click(hotFudgeCheckbox);
   expect(toppingsTotal).toHaveTextContent('1.50');
+});
+
+describe('my grand total', () => {
+  test('grand total starts at $0.00', async () => {
+    render(<OrderEntry />);
+    const total = screen.getByRole('heading', {
+      name: /Grand total: \$/,
+    });
+    expect(total).toHaveTextContent('0.00');
+  });
+
+  test('grand total updates properly if scoop is added first', async () => {
+    render(<OrderEntry />);
+    const total = screen.getByRole('heading', {
+      name: /Grand total: \$/,
+    });
+    const scoop = await screen.findByRole('spinbutton', { name: 'Chocolate' });
+    const topping = await screen.findByRole('checkbox', { name: 'Cherries' });
+
+    userEvent.type(scoop, '1');
+    expect(total).toHaveTextContent('2.00');
+
+    userEvent.click(topping);
+    expect(total).toHaveTextContent('3.50');
+  });
+  test('grand total updates properly if topping is added first', async () => {
+    render(<OrderEntry />);
+    const total = screen.getByRole('heading', { name: /grand total: \$/i });
+    const scoop = await screen.findByRole('spinbutton', { name: 'Chocolate' });
+    const topping = await screen.findByRole('checkbox', { name: 'Cherries' });
+
+    userEvent.click(topping);
+    expect(total).toHaveTextContent('1.50');
+
+    userEvent.clear(scoop);
+    userEvent.type(scoop, '2');
+    expect(total).toHaveTextContent('5.50');
+  });
+
+  test('grand total updates properly if item is removed', async () => {
+    render(<OrderEntry />);
+    const total = screen.getByRole('heading', { name: /grand total: \$/i });
+    const scoop = await screen.findByRole('spinbutton', { name: 'Chocolate' });
+    const topping = await screen.findByRole('checkbox', { name: 'Cherries' });
+
+    userEvent.click(topping);
+    userEvent.type(scoop, '1');
+    expect(total).toHaveTextContent('3.50');
+
+    userEvent.click(topping);
+    userEvent.type(scoop, '0');
+    expect(total).toHaveTextContent('0.00');
+  });
 });
 
 describe('grand total', () => {
